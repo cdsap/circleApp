@@ -32,7 +32,7 @@ jobs:
         run: |
            java -jar "${{ env.DV_BOOTSTRAP_JAR_PATH }}" \
              restore \
-             --dv-server="${{ env.DV_SERVER }}" \
+             --dv-server="https://${{ secrets.DV_URL }}" \
              --image-name="${{ env.DV_BOOTSTRAP_IMAGE }}" \
              --gradle-user-home="${{ env.DV_CACHE_DIR }}"
 
