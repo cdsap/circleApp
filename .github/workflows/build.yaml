@@ -22,6 +22,10 @@ jobs:
           mkdir -p "$(dirname "${{ env.DV_BOOTSTRAP_JAR_PATH }}")"
           curl --silent --fail -L -u "$DV_REPO_USERNAME:$DV_REPO_PASSWORD" https://repo.gradle.com/artifactory/develocity-bootstrap-cli-libs-releases-local/com/gradle/develocity-bootstrap-cli/${{ env.DV_BOOTSTRAP_CLI_VERSION }}/develocity-bootstrap-cli-${{ env.DV_BOOTSTRAP_CLI_VERSION }}.jar --output "${{ env.DV_BOOTSTRAP_JAR_PATH }}"
 
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+
       - name: Restore Artifact Cache
         id: restore_cache
         run: |
