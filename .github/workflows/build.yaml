@@ -8,7 +8,7 @@ jobs:
     env:
       DV_BOOTSTRAP_CLI_VERSION: 0.1
       DV_BOOTSTRAP_IMAGE: sample-gradle
-      DV_SERVER: https://${{ secrets.DV_URL }}
+      DV_SERVER: ${{ secrets.DV_URL }}
       DV_CACHE_DIR: ~/.gradle
       DV_REPO_USERNAME: ${{ secrets.DV_REPO_USERNAME }}
       DV_REPO_PASSWORD: ${{ secrets.DV_REPO_PASSWORD }}
@@ -32,7 +32,7 @@ jobs:
         run: |
            java -jar "${{ env.DV_BOOTSTRAP_JAR_PATH }}" \
              restore \
-             --dv-server="https://${{ secrets.DV_URL }}" \
+             --dv-server="${{ env.DV_SERVER }}" \
              --image-name="${{ env.DV_BOOTSTRAP_IMAGE }}" \
              --gradle-user-home="${{ env.DV_CACHE_DIR }}"
 
@@ -54,7 +54,7 @@ jobs:
         run: |
           java -jar "${{ env.DV_BOOTSTRAP_JAR_PATH }}" \
              store gradle \
-             --dv-server="https://${{ secrets.DV_URL }}" \
+             --dv-server="${{ env.DV_SERVER }}" \
              --image-name="${{ env.DV_BOOTSTRAP_IMAGE }}" \
              --gradle-user-home="${{ env.DV_CACHE_DIR }}"
 
