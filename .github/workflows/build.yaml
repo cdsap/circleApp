@@ -1,0 +1,58 @@
+name: Develocity Bootstrap CLI based Gradle build
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DV_BOOTSTRAP_CLI_VERSION: 0.1
+      DV_BOOTSTRAP_IMAGE: sample-gradle
+      DV_SERVER: https://${{ secrets.DV_URL }}
+      DV_CACHE_DIR: ~/.gradle
+      DV_REPO_USERNAME: ${{ secrets.DV_REPO_USERNAME }}
+      DV_REPO_PASSWORD: ${{ secrets.DV_REPO_PASSWORD }}
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DV_BOOTSTRAP_ACCESS_KEY }}
+    steps:
+      - name: Set Dynamic Environment Variables
+        run: echo "DV_BOOTSTRAP_JAR_PATH=${{ runner.tool_cache }}/develocity/${{ env.DV_BOOTSTRAP_CLI_VERSION }}/develocity-bootstrap-cli.jar" >> $GITHUB_ENV
+
+      - name: Setup Develocity Tools
+        run: |
+          mkdir -p "$(dirname "${{ env.DV_BOOTSTRAP_JAR_PATH }}")"
+          curl --silent --fail -L -u "$DV_REPO_USERNAME:$DV_REPO_PASSWORD" https://repo.gradle.com/artifactory/develocity-bootstrap-cli-libs-releases-local/com/gradle/develocity-bootstrap-cli/${{ env.DV_BOOTSTRAP_CLI_VERSION }}/develocity-bootstrap-cli-${{ env.DV_BOOTSTRAP_CLI_VERSION }}.jar --output "${{ env.DV_BOOTSTRAP_JAR_PATH }}"
+
+      - name: Restore Artifact Cache
+        id: restore_cache
+        run: |
+           java -jar "${{ env.DV_BOOTSTRAP_JAR_PATH }}" \
+             restore \
+             --dv-server="${{ env.DV_SERVER }}" \
+             --image-name="${{ env.DV_BOOTSTRAP_IMAGE }}" \
+             --gradle-user-home="${{ env.DV_CACHE_DIR }}"
+
+      - name: Warn on Cache Restore Failure
+        if: steps.restore_cache.outcome == 'failure'
+        run: echo "WARNING Could not restore the Artifact Cache. The build will proceed but may be slower."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build project
+        run: ./gradlew assembleDebug
+        env:
+          DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+
+      - name: Store Artifact Cache
+        if: success()
+        id: store_cache
+        run: |
+          java -jar "${{ env.DV_BOOTSTRAP_JAR_PATH }}" \
+             store gradle \
+             --dv-server="${{ env.DV_SERVER }}" \
+             --image-name="${{ env.DV_BOOTSTRAP_IMAGE }}" \
+             --gradle-user-home="${{ env.DV_CACHE_DIR }}"
+
+      - name: Warn on Cache Store Failure
+        if: steps.store_cache.outcome == 'failure'
+        run: echo "WARNING Failed to store the Artifact Cache for the next run."
