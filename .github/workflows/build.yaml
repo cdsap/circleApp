@@ -56,7 +56,7 @@ jobs:
              store gradle \
              --dv-server="${{ env.DV_SERVER }}" \
              --image-name="${{ env.DV_BOOTSTRAP_IMAGE }}" \
-             --gradle-user-home="${{ env.DV_CACHE_DIR }}"
+             --gradle-user-home="/home/runner/.gradle"
 
       - name: Warn on Cache Store Failure
         if: steps.store_cache.outcome == 'failure'
