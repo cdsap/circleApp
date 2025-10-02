@@ -12,7 +12,7 @@ jobs:
       DV_CACHE_DIR: ~/.gradle
       DV_REPO_USERNAME: ${{ secrets.DV_REPO_USERNAME }}
       DV_REPO_PASSWORD: ${{ secrets.DV_REPO_PASSWORD }}
-      DEVELOCITY_ACCESS_KEY: ${{ secrets.DV_BOOTSTRAP_ACCESS_KEY }}
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DV_BOOTSTRAP_ACCESS_KEY2 }}
     steps:
       - name: Set Dynamic Environment Variables
         run: echo "DV_BOOTSTRAP_JAR_PATH=${{ runner.tool_cache }}/develocity/${{ env.DV_BOOTSTRAP_CLI_VERSION }}/develocity-bootstrap-cli.jar" >> $GITHUB_ENV
